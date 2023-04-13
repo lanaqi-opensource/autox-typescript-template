@@ -1,0 +1,25 @@
+{
+  "name": "@lanaqi/autox-typescript-template",
+  "version": "0.0.1-alpha.1",
+  "main": "src/main.js",
+  "scripts": {
+    "build:dev": "tsup --env.NODE_ENV=development",
+    "build:prod": "tsup --env.NODE_ENV=production",
+    "rerun:dev": "tsup --env.NODE_ENV=development --env.DEPLOY_ACTION=rerun",
+    "rerun:prod": "tsup --env.NODE_ENV=production --env.DEPLOY_ACTION=rerun",
+    "save:dev": "tsup --env.NODE_ENV=development --env.DEPLOY_ACTION=save",
+    "save:prod": "tsup --env.NODE_ENV=production --env.DEPLOY_ACTION=save",
+    "deploy:dev": "tsup --env.NODE_ENV=development --env.DEPLOY_ACTION=both",
+    "deploy:prod": "tsup --env.NODE_ENV=production --env.DEPLOY_ACTION=both",
+    "watch:dev": "tsup --env.NODE_ENV=development --env.DEPLOY_ACTION=rerun --env.IS_WATCH=true",
+    "watch:prod": "tsup --env.NODE_ENV=production --env.DEPLOY_ACTION=rerun --env.IS_WATCH=true"
+  },
+  "devDependencies": {
+    "@swc/core": "^1.3.49",
+    "@tsconfig/recommended": "^1.0.2",
+    "@types/node": "^18.15.11",
+    "tslib": "^2.5.0",
+    "tsup": "^6.7.0",
+    "typescript": "^5.0.4"
+  }
+}

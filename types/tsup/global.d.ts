@@ -1,4 +1,4 @@
-export declare global {
+declare global {
 
     // 注入环境名称
     var injectEnvName: string;
@@ -10,3 +10,6 @@ export declare global {
     var injectProjectName: string;
 
 }
+
+export {
+};

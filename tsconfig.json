@@ -1,11 +1,10 @@
 {
   "compilerOptions": {
     "lib": [
-      "dom",
       "es2015"
     ],
     "allowJs": true,
-    "checkJs": true,
+    "checkJs": false,
     "importHelpers": true,
     "strict": true,
     "noImplicitAny": false,
@@ -14,10 +13,11 @@
     "alwaysStrict": false,
     "paths": {},
     "types": [
+      "node",
       "./types/autox/adbkit.d.ts",
       "./types/autox/auto.d.ts",
       "./types/autox/autojs.d.ts",
-      "./types/tsup/define.d.ts",
+      "./types/tsup/global.d.ts",
     ],
     "experimentalDecorators": false,
     "emitDecoratorMetadata": false,
@@ -29,10 +29,10 @@
   "exclude": [
     "./.vscode/",
     "./build/",
-    "./src/assets/",
     "./dist/",
-    "./node_modules/",
-    "./types",
+    "./types/",
+    "./src/assets/",
+    "./src/static/",
   ],
   "extends": "@tsconfig/recommended/tsconfig.json",
   "compileOnSave": true

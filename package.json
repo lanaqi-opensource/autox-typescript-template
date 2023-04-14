@@ -1,7 +1,7 @@
 {
   "name": "@lanaqi/autox-typescript-template",
   "version": "0.0.1-alpha.1",
-  "main": "src/main.js",
+  "main": "./dist/main.js",
   "scripts": {
     "build:dev": "tsup --env.NODE_ENV=development",
     "build:prod": "tsup --env.NODE_ENV=production",

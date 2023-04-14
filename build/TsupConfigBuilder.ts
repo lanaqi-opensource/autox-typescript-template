@@ -14,7 +14,7 @@ export class TsupConfigBuilder {
     // 运行环境
     private static NODE_ENV_KEY: string = 'NODE_ENV';
 
-    // 是否监视
+    // 是否监控变动
     private static IS_WATCH_KEY: string = 'IS_WATCH';
 
     // 部署动作
@@ -58,7 +58,7 @@ export class TsupConfigBuilder {
         return 'production' === this.getNodeEnv();
     }
 
-    // 获取是否监视
+    // 获取是否监控变动
     private getIsWatch(): boolean {
         const isWatch = this.getOverrideEnv(TsupConfigBuilder.IS_WATCH_KEY);
         if (isWatch) {
@@ -105,21 +105,28 @@ export class TsupConfigBuilder {
         const projectName = isOne ? packageName as string : this.getProjectName();
         const isProd = this.isProdEnv();
         const isWatch = this.getIsWatch();
+        // 入口文件
         let entryFiles: string[];
+        // 监控变动源码目录
         let watchSrc: string;
-        let publicDir: string;
+        // 资源目录
+        let assetsDir: string;
+        // 忽略监控变动静态目录
+        let ignoreWatchStatics: string;
         if (isOne) {
             entryFiles = [
                 './src/main.ts',
             ];
             watchSrc = './src/';
-            publicDir = './src/assets/';
+            assetsDir = './src/assets/';
+            ignoreWatchStatics = './src/static/';
         } else {
             entryFiles = [
                 `./src/${projectName}/main.ts`,
             ];
             watchSrc = `./src/${projectName}/`;
-            publicDir = `./src/${projectName}/assets/`;
+            assetsDir = `./src/${projectName}/assets/`;
+            ignoreWatchStatics = `./src/${projectName}/static/`;
         }
         return {
             name: projectName,
@@ -134,16 +141,55 @@ export class TsupConfigBuilder {
                 './.vscode/',
                 './build/',
                 './types/',
+                ignoreWatchStatics,
             ],
             onSuccess: async () => {
                 this.deployExecutor.execDeployProject(projectName);
             },
             outDir: `dist/${projectName}`,
+            define: this.buildDefineObject(isProd, projectName),
             replaceNodeEnv: true,
             clean: true,
             tsconfig: 'tsconfig.json',
-            publicDir: publicDir,
-            define: this.buildDefineObject(isProd, projectName),
+            publicDir: assetsDir,
+            platform: 'node',
+            loader: {
+                // 把所有 .xml 使用 text 加载器
+                '.xml': 'text',
+                // 把所有图片后缀使用 base64 加载器
+                '.jpg': 'base64',
+                '.jpeg': 'base64',
+                '.ico': 'base64',
+                '.gif': 'base64',
+                '.svg': 'base64',
+                '.svgz': 'base64',
+                '.webp': 'base64',
+                '.png': 'base64',
+                '.bmp': 'base64',
+                // 把所有 .txt / .text 使用 text 加载器
+                '.md': 'text',
+                '.txt': 'text',
+                '.text': 'text',
+            },
+            plugins: [
+                // 把所有 "ui"; 删除，或使用 ui.xx 时，在顶部添加 "ui"; 声明
+                {
+                    name: 'replace-ui-declare',
+                    renderChunk: async (compileCode, chunkInfo) => {
+                        if (compileCode.lastIndexOf('"ui";') > 0 || compileCode.lastIndexOf("'ui';") > 0 || compileCode.lastIndexOf('ui.') > 0) {
+                            return {
+                                code: `"ui";\n${compileCode.replace('"ui";', '').replace("'ui';", '')}`,
+                                map: chunkInfo.map,
+                            };
+                        } else {
+                            return {
+                                code: compileCode,
+                                map: chunkInfo.map,
+                            };
+                        }
+                    },
+                }
+            ],
         }
     }
 

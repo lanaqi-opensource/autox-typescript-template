@@ -1,5 +1,4 @@
 // https://tsup.egoist.dev/
-// https://paka.dev/npm/tsup@6.7.0/api#1bba6aac2221bff5
 
 import { Options as TsupOptions } from 'tsup';
 
@@ -31,7 +30,7 @@ export class TsupConfigBuilder {
 
     public constructor(overrideOptions: TsupOptions) {
         this.overrideOptions = overrideOptions;
-        this.deployExecutor = new AutoxDeployExecutor(this.getDeployAction());
+        this.deployExecutor = new AutoxDeployExecutor();
     }
 
     // 获取覆盖环境
@@ -102,13 +101,14 @@ export class TsupConfigBuilder {
     // 多项目结构：./.vscode/ | ./build/ | ./lib/ | ./node_modules/ | ./types/ | ./src/${projectName} | 
     public buildDefineConfig(packageName?: string): TsupOptions {
         const isOne = Boolean(packageName);
-        const projectName = isOne ? packageName as string : this.getProjectName();
         const isProd = this.isProdEnv();
         const isWatch = this.getIsWatch();
+        const projectName = isOne ? packageName as string : this.getProjectName();
+        const deployAction = this.getDeployAction();
         // 入口文件
         let entryFiles: string[];
         // 监控变动源码目录
-        let watchSrc: string;
+        let watchSrcDir: string;
         // 资源目录
         let assetsDir: string;
         // 忽略监控变动静态目录
@@ -117,14 +117,14 @@ export class TsupConfigBuilder {
             entryFiles = [
                 './src/main.ts',
             ];
-            watchSrc = './src/';
+            watchSrcDir = './src/';
             assetsDir = './src/assets/';
             ignoreWatchStatics = './src/static/';
         } else {
             entryFiles = [
                 `./src/${projectName}/main.ts`,
             ];
-            watchSrc = `./src/${projectName}/`;
+            watchSrcDir = `./src/${projectName}/`;
             assetsDir = `./src/${projectName}/assets/`;
             ignoreWatchStatics = `./src/${projectName}/static/`;
         }
@@ -134,7 +134,7 @@ export class TsupConfigBuilder {
             target: 'es5',
             minify: isProd,
             watch: isWatch ? [
-                watchSrc,
+                watchSrcDir,
                 './lib/',
             ] : false,
             ignoreWatch: [
@@ -144,18 +144,19 @@ export class TsupConfigBuilder {
                 ignoreWatchStatics,
             ],
             onSuccess: async () => {
-                this.deployExecutor.execDeployProject(projectName);
+                this.deployExecutor.execDeployProject(deployAction, projectName);
             },
             outDir: `dist/${projectName}`,
             define: this.buildDefineObject(isProd, projectName),
+            noExternal: [
+                'common-tags',
+            ],
             replaceNodeEnv: true,
             clean: true,
             tsconfig: 'tsconfig.json',
             publicDir: assetsDir,
             platform: 'node',
             loader: {
-                // 把所有 .xml 使用 text 加载器
-                '.xml': 'text',
                 // 把所有图片后缀使用 base64 加载器
                 '.jpg': 'base64',
                 '.jpeg': 'base64',
@@ -170,6 +171,9 @@ export class TsupConfigBuilder {
                 '.md': 'text',
                 '.txt': 'text',
                 '.text': 'text',
+                // 把所有 .htm / .html 使用 text 加载器
+                '.htm': 'text',
+                '.html': 'text',
             },
             plugins: [
                 // 把所有 "ui"; 删除，或使用 ui.xx 时，在顶部添加 "ui"; 声明

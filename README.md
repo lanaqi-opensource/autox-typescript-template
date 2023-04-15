@@ -2,7 +2,7 @@
 
 基于 VsCode 开发 TypeScript 工程化的 AutoxJS 模板。
 
-## 目录与文件说明
+## 工程结构
 
 - build
 
@@ -66,7 +66,7 @@
 
         Tsup 配置文件，一般情况下单项目不需要修改。
 
-## 使用步骤说明
+## 使用步骤
 
 1. 复制工程目录所有到你的项目中。
 2. 打开 VsCode 开启服务并监听 ADB 设备。
@@ -74,29 +74,46 @@
 4. 运行项目中 scripts 即可。
 5. 使用资源文件时，需先部署，否则无法读取（可以修改 DEPLOY_ACTION 为 both 值）。
 
-## 不支持功能
+## 编码方式
 
-暂时不支持以下代码编写方式。
+应遵守以下代码编写方式。
+
+### 导入模块方式
 
 ``` js
 
-// 以下代码时不支持的
+// 不要这样
 var circle = require('circle.js');
 console.log("半径为 4 的圆的面积是 %d", circle.area(4));
 
-// 这个 require 使用 import 来替代。
-import circle from './index';
+// 应该这样（这个 circle.js 应遵守 es5+ 标准）
+import circle from './circle';
 console.log("半径为 4 的圆的面积是 %d", circle.area(4));
 
 ```
 
+### 导入静态资源
+
+建议把这一类放置 src/static 目录下。
+
+``` ts
+
+// 支持后缀：jpg / jpeg / ico / gif / svg / svgz / webp / png / bmp
+import png from './my.png';
+
+// 同时也支持对 .md / .txt / .text 文件读取为文本字符串
+import txt from './test.txt';
+
+```
+
+### 编写 UI 方式
+
 ``` jsx
 
-// 在原始js中使用 ui 时，必须先在 main.js 的顶部使用 "ui"; 声明
-// 但在 ts 中可以忽略编写或在非顶部使用 "ui"; 声明
+// 在原始 js 中使用 ui 时，必须先在 main.js 的顶部 "ui"; 声明。
+// 在这里不必声明，会自动注入，当使用 ui. 时注入。
 
-// 以下代码时不支持的
-"ui";
+// 不要这样
 ui.layout(
     <vertical>
         <button text="第一个按钮"/>
@@ -104,25 +121,35 @@ ui.layout(
     </vertical>
 );
 
-// 使用 x.xml 替换
-// a.xml
-<vertical>
+// 静态模板（如果可以还是使用静态模板比较好）
+// 建议放到 html 目录下（该目录受监控变动处理）
+import mainHtml from './html/main.html';
+import png from './my.png';
+ui.layout(mainHtml);
+// 动态修改属性
+const myImg = ui.findView('id');
+myImg.attr('src', `data:image/png;base64,${png}`);
+
+// 动态模板
+// 应该这样，更多参考：https://github.com/zspecza/common-tags
+import { html } from 'common-tags';
+import png from './my.png';
+
+ui.layout(html`
+    <vertical>
         <button text="第一个按钮"/>
         <button text="第二个按钮"/>
-</vertical>
+        <img src="data:image/png;base64,${png}" />
+    </vertical>
+`);
 
-// 在 main.ts 中以下编写都是可以编译以及运行的
-ui.layout(require('./main.xml'));
+```
 
-// 或者手动添加 "ui"; 声明
-"ui";
-ui.layout(require('./main.xml'));
+### 不推荐编码
 
-// 注意导入文件必须是 require('./main.xml') 方式编码。
+``` ts
 
-// ps: 对于图片类型可以编译为 base64 然后使用 images.fromBase64(require('./my.png')) 方式读取。
-// 支持后缀：jpg / jpeg / ico / gif / svg / svgz / webp / png / bmp
-// 注意：加载图片与资源并非是一类的。
-// 建议把这一类放置 src/statics 目录下。
+// 尽量不要用 require 函数
+require('./test.txt');
 
 ```

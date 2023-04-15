@@ -1,3 +1,5 @@
+// 全局
+
 declare global {
 
     // 注入环境名称
@@ -11,5 +13,5 @@ declare global {
 
 }
 
-export {
+export  {
 };

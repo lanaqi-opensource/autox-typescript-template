@@ -15,11 +15,7 @@ export class AutoxDeployExecutor {
     // 输出主文件值
     private static MAIN_PATH: string = './main.js';
 
-    // 部署动作
-    private deployAction?: AutoxDeployAction;
-
-    public constructor(deployAction?: AutoxDeployAction) {
-        this.setDeployAction(deployAction);
+    public constructor() {
     }
 
     // 发送部署命令
@@ -60,37 +56,18 @@ export class AutoxDeployExecutor {
         this.sendDeployCmd('save', this.getDistPath(deployName), deployName);
     }
 
-    // 设置部署动作
-    public setDeployAction(deployAction?: AutoxDeployAction): void {
-        if (deployAction) {
-            this.deployAction = deployAction;
-        } else {
-            this.deployAction = 'none';
-        }
-    }
-
-    // 获取部署动作
-    public getDeployAction(): AutoxDeployAction {
-        if (this.deployAction) {
-            return this.deployAction;
-        } else {
-            return 'none';
-        }
-    }
-
-    // 获取部署名称
-    public getDeployName(projectName?: string): string {
+    // 解析部署名称
+    public resolveDeployName(projectName?: string): string {
         if (projectName) {
             return projectName;
-        } else {
-            return 'unknown';
         }
+        // 这里可以修改一些自定义解析处理
+        throw new Error('部署执行器: -> 解析错误，未知部署名称！');
     }
 
     // 执行部署项目
-    public execDeployProject(projectName?: string): void {
-        const deployName: string = this.getDeployName(projectName);
-        const deployAction: AutoxDeployAction = this.getDeployAction();
+    public execDeployProject(deployAction: AutoxDeployAction, projectName?: string): void {
+        const deployName: string = this.resolveDeployName(projectName);
         switch (deployAction) {
             case 'save':
                 this.execSaveCmd(deployName);

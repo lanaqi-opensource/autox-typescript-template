@@ -1,43 +1,10 @@
 {
-    "abis": [
-        "arm64-v8a",
-        "armeabi-v7a",
-        "x86",
-        "x86_64"
-    ],
-    "assets": [],
-    "buildDir": "build",
-    "build": {
-        "build_id": null,
-        "build_number": 0,
-        "build_time": 0
-    },
-    "useFeatures": [],
-    "icon": null,
-    "ignoredDirs": [],
-    "launchConfig": {
-        "displaySplash": false,
-        "hideLauncher": false,
-        "hideLogs": false,
-        "stableMode": false,
-        "volumeUpcontrol": false,
-        "permissions": [],
-        "serviceDesc": "",
-        "splashIcon": null,
-        "splashText": ""
-    },
-    "libs": [],
-    "main": "main.js",
     "name": "autox-typescript-template",
-    "outputPath": null,
-    "packageName": "com.lanaqi.autox.template",
-    "projectDirectory": null,
-    "scripts": {},
-    "signingConfig": {
-        "alias": null,
-        "keystore": null
-    },
-    "sourcePath": null,
+    "versionName": "0.0.1",
     "versionCode": 1,
-    "versionName": "0.0.1"
+    "packageName": "com.lanaqi.autox.template",
+    "main": "main.js",
+    "launchConfig": {
+        "hideLogs": false
+    }
 }

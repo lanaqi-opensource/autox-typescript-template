@@ -7,6 +7,9 @@ import { AutoxDeployAction, AutoxDeployExecutor } from './AutoxDeployExecutor';
 // Tsup 运行环境
 export declare type TsupNodeEnv = 'production' | 'development';
 
+// Tsup 非外部库
+export declare type TsupNoExternal = (string | RegExp)[];
+
 // Tsup 配置构建器
 export class TsupConfigBuilder {
 
@@ -21,6 +24,9 @@ export class TsupConfigBuilder {
 
     // 项目名称
     private static PROJECT_NAME_KEY: string = 'PROJECT_NAME';
+
+    // 资源值前缀（非打包时，部署的资源路径）
+    private static ASSETS_PATH_PREFIX: string = '/sdcard/脚本';
 
     // 覆盖可选
     private overrideOptions: TsupOptions;
@@ -91,7 +97,7 @@ export class TsupConfigBuilder {
     private buildDefineObject(isProd: boolean, projectName: string): Record<string, string> {
         return {
             'injectEnvName': `"${this.getNodeEnv()}"`,
-            'injectAssetsPath': isProd ? '"."' : `"/sdcard/脚本/${projectName}"`,
+            'injectAssetsPath': isProd ? '"."' : `"${TsupConfigBuilder.ASSETS_PATH_PREFIX}/${projectName}"`,
             'injectProjectName': `'${projectName}'`
         };
     }
@@ -99,12 +105,17 @@ export class TsupConfigBuilder {
     // 构建定义配置
     // 单项目结构：./.vscode/ | ./build/ | ./lib/ | ./node_modules/ | ./types/ | ./src/ |
     // 多项目结构：./.vscode/ | ./build/ | ./lib/ | ./node_modules/ | ./types/ | ./src/${projectName} | 
-    public buildDefineConfig(packageName?: string): TsupOptions {
+    public buildDefineConfig(externalLib: TsupNoExternal, packageName?: string): TsupOptions {
         const isOne = Boolean(packageName);
         const isProd = this.isProdEnv();
         const isWatch = this.getIsWatch();
         const projectName = isOne ? packageName as string : this.getProjectName();
         const deployAction = this.getDeployAction();
+        // 非外部库（引用会打包）
+        const noExterna: TsupNoExternal = [
+            // 框架引用库
+            'common-tags',
+        ];
         // 入口文件
         let entryFiles: string[];
         // 监控变动源码目录
@@ -113,6 +124,9 @@ export class TsupConfigBuilder {
         let assetsDir: string;
         // 忽略监控变动静态目录
         let ignoreWatchStatics: string;
+        if (Array.isArray(externalLib) && externalLib.length > 0) {
+            noExterna.push(...externalLib);
+        }
         if (isOne) {
             entryFiles = [
                 './src/main.ts',
@@ -148,9 +162,7 @@ export class TsupConfigBuilder {
             },
             outDir: `dist/${projectName}`,
             define: this.buildDefineObject(isProd, projectName),
-            noExternal: [
-                'common-tags',
-            ],
+            noExternal: noExterna,
             replaceNodeEnv: true,
             clean: true,
             tsconfig: 'tsconfig.json',
@@ -198,8 +210,8 @@ export class TsupConfigBuilder {
     }
 
     // 使用新的配置
-    public static withNewConfig(overrideOptions: TsupOptions, packageName?: string): TsupOptions {
-        return new TsupConfigBuilder(overrideOptions).buildDefineConfig(packageName);
+    public static withNewConfig(overrideOptions: TsupOptions, externalLib: TsupNoExternal, packageName?: string): TsupOptions {
+        return new TsupConfigBuilder(overrideOptions).buildDefineConfig(externalLib, packageName);
     }
 
 }

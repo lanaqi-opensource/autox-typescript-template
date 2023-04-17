@@ -14,13 +14,15 @@
     "watch:dev": "tsup --env.NODE_ENV=development --env.DEPLOY_ACTION=rerun --env.IS_WATCH=true",
     "watch:prod": "tsup --env.NODE_ENV=production --env.DEPLOY_ACTION=rerun --env.IS_WATCH=true"
   },
+  "dependencies": {
+    "common-tags": "^1.8.2"
+  },
   "devDependencies": {
     "@swc/core": "^1.3.49",
-    "@tsconfig/recommended": "^1.0.2",
-    "@types/node": "^18.15.11",
-    "common-tags": "^1.8.2",
-    "tslib": "^2.5.0",
     "tsup": "^6.7.0",
-    "typescript": "^5.0.4"
+    "tslib": "^2.5.0",
+    "typescript": "^5.0.4",
+    "@types/node": "^18.15.11",
+    "@tsconfig/recommended": "^1.0.2"
   }
 }

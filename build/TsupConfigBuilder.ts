@@ -109,13 +109,17 @@ export class TsupConfigBuilder {
         const isOne = Boolean(packageName);
         const isProd = this.isProdEnv();
         const isWatch = this.getIsWatch();
-        const projectName = isOne ? packageName as string : this.getProjectName();
         const deployAction = this.getDeployAction();
         // 非外部库（引用会打包）
         const noExterna: TsupNoExternal = [
             // 框架引用库
             'common-tags',
         ];
+        let projectName = isOne ? packageName as string : this.getProjectName();
+        if (projectName.lastIndexOf('/') !== -1) {
+            const splitNames = projectName.split('/');
+            projectName = splitNames[splitNames.length - 1];
+        }
         // 入口文件
         let entryFiles: string[];
         // 监控变动源码目录

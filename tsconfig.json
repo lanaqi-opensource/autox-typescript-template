@@ -11,6 +11,7 @@
     "strictNullChecks": false,
     "noImplicitThis": true,
     "alwaysStrict": false,
+    "baseUrl": ".",
     "paths": {},
     "types": [
       "node",
@@ -18,14 +19,15 @@
       "./types/autox/auto.d.ts",
       "./types/autox/autojs.d.ts",
       "./types/project/global.d.ts",
-      "./types/project/module.d.ts",
+      "./types/project/module.d.ts"
     ],
     "experimentalDecorators": false,
     "emitDecoratorMetadata": false,
+    "resolveJsonModule": true
   },
   "include": [
     "./src/**/*",
-    "./lib/**/*",
+    "./lib/**/*"
   ],
   "exclude": [
     "./.vscode/",
@@ -33,7 +35,7 @@
     "./dist/",
     "./types/",
     "./src/assets/",
-    "./src/static/",
+    "./src/static/"
   ],
   "extends": "@tsconfig/recommended/tsconfig.json",
   "compileOnSave": true

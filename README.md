@@ -94,7 +94,7 @@ console.log("半径为 4 的圆的面积是 %d", circle.area(4));
 
 ### 导入静态资源
 
-建议把这一类放置 src/static 目录下。
+建议把这一类放置 src/statics 目录下。
 
 ``` ts
 

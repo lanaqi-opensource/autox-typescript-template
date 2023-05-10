@@ -1,5 +1,3 @@
-// https://tsup.egoist.dev/
-
 import { Options as TsupOptions } from 'tsup';
 
 import { AutoxDeployAction, AutoxDeployExecutor } from './AutoxDeployExecutor';
@@ -7,7 +5,10 @@ import { AutoxDeployAction, AutoxDeployExecutor } from './AutoxDeployExecutor';
 // Tsup 运行环境
 export declare type TsupNodeEnv = 'production' | 'development';
 
-// Tsup 非外部库
+// Tsup 排除库
+export declare type TsupExternal = (string | RegExp)[];
+
+// Tsup 打包库
 export declare type TsupNoExternal = (string | RegExp)[];
 
 // Tsup 配置构建器
@@ -94,10 +95,11 @@ export class TsupConfigBuilder {
     }
 
     // 构建定义对象
-    private buildDefineObject(isProd: boolean, projectName: string): Record<string, string> {
+    private buildDefineObject(isProd: boolean, projectName: string, assetsPrefix?: string): Record<string, string> {
+        const pathPrefix = assetsPrefix ? assetsPrefix : TsupConfigBuilder.ASSETS_PATH_PREFIX;
         return {
             'injectEnvName': `"${this.getNodeEnv()}"`,
-            'injectAssetsPath': isProd ? '"."' : `"${TsupConfigBuilder.ASSETS_PATH_PREFIX}/${projectName}"`,
+            'injectAssetsPath': isProd ? '"."' : `"${pathPrefix}/${projectName}"`,
             'injectProjectName': `'${projectName}'`
         };
     }
@@ -105,16 +107,11 @@ export class TsupConfigBuilder {
     // 构建定义配置
     // 单项目结构：./.vscode/ | ./build/ | ./lib/ | ./node_modules/ | ./types/ | ./src/ |
     // 多项目结构：./.vscode/ | ./build/ | ./lib/ | ./node_modules/ | ./types/ | ./src/${projectName} | 
-    public buildDefineConfig(externalLib: TsupNoExternal, packageName?: string): TsupOptions {
+    public buildDefineConfig(external: TsupExternal, noExternal: TsupNoExternal, packageName?: string, uiMatch?: boolean, assetsPrefix?: string): TsupOptions {
         const isOne = Boolean(packageName);
         const isProd = this.isProdEnv();
         const isWatch = this.getIsWatch();
         const deployAction = this.getDeployAction();
-        // 非外部库（引用会打包）
-        const noExterna: TsupNoExternal = [
-            // 框架引用库
-            'common-tags',
-        ];
         let projectName = isOne ? packageName as string : this.getProjectName();
         if (projectName.lastIndexOf('/') !== -1) {
             const splitNames = projectName.split('/');
@@ -128,23 +125,24 @@ export class TsupConfigBuilder {
         let assetsDir: string;
         // 忽略监控变动静态目录
         let ignoreWatchStatics: string;
-        if (Array.isArray(externalLib) && externalLib.length > 0) {
-            noExterna.push(...externalLib);
-        }
         if (isOne) {
             entryFiles = [
                 './src/main.ts',
+                './src/test.ts',
+                './src/ui.ts',
             ];
             watchSrcDir = './src/';
             assetsDir = './src/assets/';
-            ignoreWatchStatics = './src/static/';
+            ignoreWatchStatics = './src/statics/';
         } else {
             entryFiles = [
                 `./src/${projectName}/main.ts`,
+                `./src/${projectName}/test.ts`,
+                `./src/${projectName}/ui.ts`,
             ];
             watchSrcDir = `./src/${projectName}/`;
             assetsDir = `./src/${projectName}/assets/`;
-            ignoreWatchStatics = `./src/${projectName}/static/`;
+            ignoreWatchStatics = `./src/${projectName}/statics/`;
         }
         return {
             name: projectName,
@@ -165,8 +163,9 @@ export class TsupConfigBuilder {
                 this.deployExecutor.execDeployProject(deployAction, projectName);
             },
             outDir: `dist/${projectName}`,
-            define: this.buildDefineObject(isProd, projectName),
-            noExternal: noExterna,
+            define: this.buildDefineObject(isProd, projectName, assetsPrefix),
+            external: external,
+            noExternal: noExternal,
             replaceNodeEnv: true,
             clean: true,
             tsconfig: 'tsconfig.json',
@@ -190,13 +189,15 @@ export class TsupConfigBuilder {
                 // 把所有 .htm / .html 使用 text 加载器
                 '.htm': 'text',
                 '.html': 'text',
+                // 把所有 .xml 使用 text 加载器
+                '.xml': 'text',
             },
             plugins: [
-                // 把所有 "ui"; 删除，或使用 ui.xx 时，在顶部添加 "ui"; 声明
+                // 把所有 "ui"; 删除，在顶部添加 "ui"; 声明
                 {
                     name: 'replace-ui-declare',
                     renderChunk: async (compileCode, chunkInfo) => {
-                        if (compileCode.lastIndexOf('"ui";') > 0 || compileCode.lastIndexOf("'ui';") > 0 || compileCode.lastIndexOf('ui.') > 0) {
+                        if (compileCode.lastIndexOf('"ui";') > -1 || compileCode.lastIndexOf("'ui';") > -1 || (uiMatch && compileCode.lastIndexOf('ui.') > -1)) {
                             return {
                                 code: `"ui";\n${compileCode.replace('"ui";', '').replace("'ui';", '')}`,
                                 map: chunkInfo.map,
@@ -214,8 +215,8 @@ export class TsupConfigBuilder {
     }
 
     // 使用新的配置
-    public static withNewConfig(overrideOptions: TsupOptions, externalLib: TsupNoExternal, packageName?: string): TsupOptions {
-        return new TsupConfigBuilder(overrideOptions).buildDefineConfig(externalLib, packageName);
+    public static withNewConfig(overrideOptions: TsupOptions, external: TsupExternal, noExternal: TsupNoExternal, packageName?: string, uiMatch?: boolean, assetsPrefix?: string): TsupOptions {
+        return new TsupConfigBuilder(overrideOptions).buildDefineConfig(external, noExternal, packageName, uiMatch, assetsPrefix);
     }
 
 }

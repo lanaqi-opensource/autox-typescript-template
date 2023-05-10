@@ -1,61 +1,125 @@
 // 模板
 
+declare module "*.xml" {
+
+    const content: string;
+
+    export default content;
+
+}
+
 declare module "*.htm" {
-    export default {};
+
+    const content: string;
+
+    export default content;
+
 }
 
 declare module "*.html" {
-    export default {};
+
+    const content: string;
+
+    export default content;
+
 }
 
 // 图片
 
 declare module "*.jpg" {
-    export default {};
+
+    const content: string;
+
+    export default content;
+
 }
 
 declare module "*.jpeg" {
-    export default {};
+
+    const content: string;
+
+    export default content;
+
 }
 
 declare module "*.ico" {
-    export default {};
+
+    const content: string;
+
+    export default content;
+
 }
 
 declare module "*.gif" {
-    export default {};
+
+    const content: string;
+
+    export default content;
+
 }
 
 declare module "*.svg" {
-    export default {};
+
+    const content: string;
+
+    export default content;
+
 }
 
 declare module "*.svgz" {
-    export default {};
+
+    const content: string;
+
+    export default content;
+
 }
 
 declare module "*.webp" {
-    export default {};
+
+    const content: string;
+
+    export default content;
+
 }
 
 declare module "*.png" {
-    export default {};
+
+    const content: string;
+
+    export default content;
+
 }
 
 declare module "*.bmp" {
-    export default {};
+
+    const content: string;
+
+    export default content;
+
 }
 
 // 文本
 
 declare module "*.md" {
-    export default {};
+
+    const content: string;
+
+    export default content;
+
 }
 
 declare module "*.txt" {
-    export default {};
+
+    const content: string;
+
+    export default content;
+
 }
 
 declare module "*.text" {
-    export default {};
+
+    const content: string;
+
+    export default content;
+
 }

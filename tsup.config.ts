@@ -1,11 +1,19 @@
-import { Options as TsupOptions, defineConfig } from 'tsup';
-
-import { name as packageName } from './package.json';
+import { defineConfig, Options as TsupOptions } from 'tsup';
 
 import { TsupConfigBuilder } from './build/TsupConfigBuilder';
 
+// @ts-ignore
+import { name as packageName } from './package.json';
+
 export default defineConfig((overrideOptions: TsupOptions) =>
     TsupConfigBuilder.withNewConfig(
-        overrideOptions, [], packageName
-    )
+        overrideOptions,
+        [
+        ],
+        [
+            'common-tags',
+        ],
+        packageName,
+        true,
+    ),
 );

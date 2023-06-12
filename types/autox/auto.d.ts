@@ -19,7 +19,7 @@
 /// <reference path="./modules/widgets.d.ts" />
 /// <reference path="./modules/ui.d.ts" />
 /// <reference path="./modules/threads.d.ts" />
-
+/// <reference path="./modules/ocr.d.ts" />
 
 declare global {
 

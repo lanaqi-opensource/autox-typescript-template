@@ -10,18 +10,14 @@
     "noImplicitAny": false,
     "strictNullChecks": true,
     "noImplicitThis": true,
-    "alwaysStrict": true,
+    "alwaysStrict": false,
     "noImplicitReturns": true,
     "allowUmdGlobalAccess": true,
     "baseUrl": ".",
     "paths": {},
     "types": [
       "node",
-      "./types/autox/adbkit.d.ts",
-      "./types/autox/auto.d.ts",
-      "./types/autox/autojs.d.ts",
-      "./types/project/global.d.ts",
-      "./types/project/module.d.ts"
+      "./types/index.d.ts"
     ],
     "experimentalDecorators": false,
     "emitDecoratorMetadata": false,

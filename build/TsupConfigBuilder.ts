@@ -27,7 +27,7 @@ export class TsupConfigBuilder {
     private static PROJECT_NAME_KEY: string = 'PROJECT_NAME';
 
     // 资源值前缀（非打包时，部署的资源路径）
-    private static ASSETS_PATH_PREFIX: string = '/sdcard/脚本';
+    public static ASSETS_PATH_PREFIX: string = '/sdcard/脚本';
 
     // 覆盖可选
     private overrideOptions: TsupOptions;
@@ -96,10 +96,19 @@ export class TsupConfigBuilder {
 
     // 构建定义对象
     private buildDefineObject(isProd: boolean, projectName: string, assetsPrefix?: string): Record<string, string> {
-        const pathPrefix = assetsPrefix ? assetsPrefix : TsupConfigBuilder.ASSETS_PATH_PREFIX;
+        let assetsPath;
+        if (assetsPrefix) {
+            assetsPath = `${assetsPrefix}/${projectName}`;
+        } else {
+            if (isProd) {
+                assetsPath = '.';
+            } else {
+                assetsPath = `${TsupConfigBuilder.ASSETS_PATH_PREFIX}/${projectName}`;
+            }
+        }
         return {
             'injectEnvName': `"${this.getNodeEnv()}"`,
-            'injectAssetsPath': isProd ? '"."' : `"${pathPrefix}/${projectName}"`,
+            'injectAssetsPath': `"${assetsPath}"`,
             'injectProjectName': `'${projectName}'`
         };
     }

@@ -15,5 +15,6 @@ export default defineConfig((overrideOptions: TsupOptions) =>
         ],
         packageName,
         true,
+        // TsupConfigBuilder.ASSETS_PATH_PREFIX,
     ),
 );

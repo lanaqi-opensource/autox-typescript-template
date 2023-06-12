@@ -5,6 +5,7 @@ interface Image {
     getHeight(): number;
     saveTo(path: string): void;
     pixel(x: number, y: number): number;
+    recycle(): void;
 }
 
 
@@ -16,6 +17,7 @@ declare namespace images {
     function save(image: Image, path: string): void;
     function read(path: string): Image;
     function load(url: string): Image;
+    function copy(image: Image): Image;
     interface FindColorOptions {
         region?: [number, number] | [number, number, number, number];
         threshold?: number;

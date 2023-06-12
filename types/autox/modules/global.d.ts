@@ -26,3 +26,4 @@ declare function exit(): void;
 declare function random(): number;
 declare function random(min: number, max: number): number;
 
+declare function sync<R>(handler: () => R): () => R;

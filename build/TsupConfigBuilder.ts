@@ -95,7 +95,7 @@ export class TsupConfigBuilder {
     }
 
     // 构建定义对象
-    private buildDefineObject(isProd: boolean, projectName: string, assetsPrefix?: string): Record<string, string> {
+    private buildDefineObject(isProd: boolean, projectName: string, injectVariable: Record<string, string> = {}, assetsPrefix?: string): Record<string, string> {
         let assetsPath;
         if (assetsPrefix) {
             assetsPath = `${assetsPrefix}/${projectName}`;
@@ -109,14 +109,15 @@ export class TsupConfigBuilder {
         return {
             'injectEnvName': `"${this.getNodeEnv()}"`,
             'injectAssetsPath': `"${assetsPath}"`,
-            'injectProjectName': `'${projectName}'`
+            'injectProjectName': `'${projectName}'`,
+            ...injectVariable,
         };
     }
 
     // 构建定义配置
     // 单项目结构：./.vscode/ | ./build/ | ./lib/ | ./node_modules/ | ./types/ | ./src/ |
     // 多项目结构：./.vscode/ | ./build/ | ./lib/ | ./node_modules/ | ./types/ | ./src/${projectName} | 
-    public buildDefineConfig(external: TsupExternal, noExternal: TsupNoExternal, packageName?: string, uiMatch?: boolean, assetsPrefix?: string): TsupOptions {
+    public buildDefineConfig(external: TsupExternal, noExternal: TsupNoExternal, packageName?: string, uiMatch?: boolean, injectVariable?: Record<string, string>, assetsPrefix?: string): TsupOptions {
         const isOne = Boolean(packageName);
         const isProd = this.isProdEnv();
         const isWatch = this.getIsWatch();
@@ -172,7 +173,7 @@ export class TsupConfigBuilder {
                 this.deployExecutor.execDeployProject(deployAction, projectName);
             },
             outDir: `dist/${projectName}`,
-            define: this.buildDefineObject(isProd, projectName, assetsPrefix),
+            define: this.buildDefineObject(isProd, projectName, injectVariable, assetsPrefix),
             external: external,
             noExternal: noExternal,
             replaceNodeEnv: true,
@@ -224,8 +225,8 @@ export class TsupConfigBuilder {
     }
 
     // 使用新的配置
-    public static withNewConfig(overrideOptions: TsupOptions, external: TsupExternal, noExternal: TsupNoExternal, packageName?: string, uiMatch?: boolean, assetsPrefix?: string): TsupOptions {
-        return new TsupConfigBuilder(overrideOptions).buildDefineConfig(external, noExternal, packageName, uiMatch, assetsPrefix);
+    public static withNewConfig(overrideOptions: TsupOptions, external: TsupExternal, noExternal: TsupNoExternal, packageName?: string, uiMatch?: boolean, injectVariable?: Record<string, string>, assetsPrefix?: string): TsupOptions {
+        return new TsupConfigBuilder(overrideOptions).buildDefineConfig(external, noExternal, packageName, uiMatch, injectVariable, assetsPrefix);
     }
 
 }

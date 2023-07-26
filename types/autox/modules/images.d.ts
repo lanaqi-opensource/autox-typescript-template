@@ -18,6 +18,7 @@ declare namespace images {
     function read(path: string): Image;
     function load(url: string): Image;
     function copy(image: Image): Image;
+    function grayscale(image: Image): Image;
     interface FindColorOptions {
         region?: [number, number] | [number, number, number, number];
         threshold?: number;

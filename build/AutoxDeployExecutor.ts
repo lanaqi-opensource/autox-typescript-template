@@ -1,5 +1,3 @@
-// https://github.com/kkevsekk1/AutoxDeployWebpackPlugin/blob/main/index.js
-
 import nodeHttp from 'http';
 import nodePath from 'path';
 

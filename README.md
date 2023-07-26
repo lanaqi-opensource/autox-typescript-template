@@ -1,6 +1,6 @@
 # Autox TypeScript Template
 
-基于 VsCode 开发 TypeScript 工程化的 AutoxJS 模板。
+基于 VsCode 开发 TypeScript 工程化的 Autox 模板。
 
 ## 工程结构
 
